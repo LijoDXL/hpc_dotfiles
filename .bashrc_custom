@@ -1,0 +1,29 @@
+# If you come from bash you might have to change your $PATH.
+# export PATH=$HOME/bin:/usr/local/bin:$PATH
+
+# and get the ls colors right
+eval `dircolors $HOME/.lijo_dotfiles/.dircolors`
+
+# some more ls aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+alias lrt='ls -lrt'
+alias q='exit'
+alias clr='clear'
+tmx() {
+  tmux -f $HOME/.lijo_dotfiles/.tmux.conf $*;
+}
+edjnl() {
+  vim fjnl/ferret.jnl.~$1~;
+}
+wcjnl() {
+  wc fjnl/ferret.jnl.~$1~;
+}
+#search for a keywork inside fjnl directory
+jnls() {
+  grep $1 fjnl/*;
+}
+#search for a keyword in a partiuclar jnl file
+alias jnlvar='$HOME/.lijo_dotfiles/.grepjnl.com'
+

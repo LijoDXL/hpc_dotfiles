@@ -1,0 +1,6 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =4
+let g:netrw_dirhist_1='/incois_ncmrwfx/incois/hycom/HWRF_parent/hwrfrun/sorc/hycom_emc'
+let g:netrw_dirhist_2='/incois_ncmrwfx/incois/hycom/HWRF_parent/hwrfrun/sorc/hycom_emc/forecast/hwrf_forecast_DANchanged'
+let g:netrw_dirhist_3='/incois_ncmrwfx/incois/hycom/HWRF_parent/hwrfrun/sorc/hycom/forecast/hwrf_forecast_BACKUP'
+let g:netrw_dirhist_4='/incois_ncmrwfx/incois/hycom/hwrf_output/pytmp/incoisHYCOMcoupled_test'
