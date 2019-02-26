@@ -47,6 +47,26 @@ source /gpfs1/opt/intel/parallel_studio_xe_2016/compilers_and_libraries_2016.2.1
 
 export PATH=$PATH:$HOME/local/bin:$HOME/bin
 
+#################################conda setup##################################################
 # added by Miniconda2 installer
 # export PATH="/incois_ncmrwfx/incois/hycom/miniconda2/bin:$PATH" # for conda ver < 4.4.x
-. /moes/home/hycom/miniconda2/etc/profile.d/conda.sh # for conda ver > 4.4.x
+# . /moes/home/hycom/miniconda2/etc/profile.d/conda.sh # for conda ver > 4.4.x
+. "/incois_ncmrwfx/incois/hycom/miniconda3/etc/profile.d/conda.sh"
+
+# added by Miniconda3 4.5.12 installer
+# >>> conda init >>>
+# !! Contents within this block are managed by 'conda init' !!
+# __conda_setup="$(CONDA_REPORT_ERRORS=false '/incois_ncmrwfx/incois/hycom/miniconda3/bin/conda' shell.bash hook 2> /dev/null)"
+# if [ $? -eq 0 ]; then
+    # \eval "$__conda_setup"
+# else
+    # if [ -f "/incois_ncmrwfx/incois/hycom/miniconda3/etc/profile.d/conda.sh" ]; then
+        # . "/incois_ncmrwfx/incois/hycom/miniconda3/etc/profile.d/conda.sh"
+        # CONDA_CHANGEPS1=false conda activate base
+    # else
+        # \export PATH="/incois_ncmrwfx/incois/hycom/miniconda3/bin:$PATH"
+    # fi
+# fi
+# unset __conda_setup
+# <<< conda init <<<
+##############################################################################################

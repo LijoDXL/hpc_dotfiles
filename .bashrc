@@ -31,7 +31,7 @@ alias hlog='cd /incois_ncmrwfx/incois/hycom/HWRF_parent/hwrfrun/wrappers/logs/'
 alias hsrc='cd /incois_ncmrwfx/incois/hycom/HWRF_parent/hwrfrun/sorc/'
 
 #exports for HWRF Workflow
-h=/incois_ncmrwfx/incois/hycom
+hm=/incois_ncmrwfx/incois/hycom
 hw=/incois_ncmrwfx/incois/hycom/HWRF_parent/hwrfrun/wrappers
 parm=/incois_ncmrwfx/incois/hycom/HWRF_parent/hwrfrun/parm
 dsets=/incois_ncmrwfx/incois/hycom/dataset

@@ -37,6 +37,10 @@ set incsearch     " do incremental searching
 set hlsearch      " highlight matches
 set autowrite     " Automatically :write before running commands
 
+"code folding
+set foldmethod=indent
+set foldlevel=99
+
 " statusline
 set laststatus=2  " Always display the status line
 " now set it up to change the status line based on mode
