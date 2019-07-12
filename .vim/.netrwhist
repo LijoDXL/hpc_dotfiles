@@ -1,6 +1,11 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =4
+let g:netrw_dirhist_cnt =9
 let g:netrw_dirhist_1='/incois_ncmrwfx/incois/hycom/HWRF_parent/hwrfrun/sorc/hycom_emc'
 let g:netrw_dirhist_2='/incois_ncmrwfx/incois/hycom/HWRF_parent/hwrfrun/sorc/hycom_emc/forecast/hwrf_forecast_DANchanged'
 let g:netrw_dirhist_3='/incois_ncmrwfx/incois/hycom/HWRF_parent/hwrfrun/sorc/hycom/forecast/hwrf_forecast_BACKUP'
 let g:netrw_dirhist_4='/incois_ncmrwfx/incois/hycom/hwrf_output/pytmp/incoisHYCOMcoupled_test'
+let g:netrw_dirhist_5='/moes/home/hycom/.dotfiles/.vim/syntax'
+let g:netrw_dirhist_6='/incois_ncmrwfx/incois_tccsym/OUTPUTS/pytmp/incoisHYCOMcoupledIMD/2018121400/08B/tracker'
+let g:netrw_dirhist_7='/incois_ncmrwfx/incois/hycom/HWRF_parent/hwrfrun/parm/USERconf'
+let g:netrw_dirhist_8='/incois_ncmrwfx/incois/hycom/ARVIND_SINGH/PYTHON'
+let g:netrw_dirhist_9='/moes/home/hycom/.ssh'

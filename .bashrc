@@ -1,5 +1,5 @@
 # .bashrc
-
+module load cdo
 # Source global definitions
 
 if [ -f /etc/bashrc ]; then
@@ -25,7 +25,7 @@ alias libpath='echo -e ${LD_LIBRARY_PATH//:/\\n}'
 # aliases for HWRF workflow
 alias h='cd /incois_ncmrwfx/incois/hycom/'
 alias hp='cd /incois_ncmrwfx/incois/hycom/HWRF_parent/'
-alias ho='cd /incois_ncmrwfx/incois/hycom/hwrf_output/pytmp'
+alias ho='cd /incois_ncmrwfx/incois_tccsym/OUTPUTS/pytmp/'
 alias hw='cd /incois_ncmrwfx/incois/hycom/HWRF_parent/hwrfrun/wrappers/'
 alias hlog='cd /incois_ncmrwfx/incois/hycom/HWRF_parent/hwrfrun/wrappers/logs/'
 alias hsrc='cd /incois_ncmrwfx/incois/hycom/HWRF_parent/hwrfrun/sorc/'
@@ -33,9 +33,11 @@ alias hsrc='cd /incois_ncmrwfx/incois/hycom/HWRF_parent/hwrfrun/sorc/'
 #exports for HWRF Workflow
 hm=/incois_ncmrwfx/incois/hycom
 hw=/incois_ncmrwfx/incois/hycom/HWRF_parent/hwrfrun/wrappers
+hw4=/incois_ncmrwfx/incois/hycom/HWRF_v4.0/hwrfrun/wrappers
 parm=/incois_ncmrwfx/incois/hycom/HWRF_parent/hwrfrun/parm
 dsets=/incois_ncmrwfx/incois/hycom/dataset
-ho=/incois_ncmrwfx/incois/hycom/hwrf_output/pytmp
+hdsets=/incois_ncmrwfx/incois_tccsym/FORCING
+ho=/incois_ncmrwfx/incois_tccsym/OUTPUTS/pytmp
 
 # some more aliases
 alias util='ssh -X -t iitmutil03 "cd $PWD; bash --login"'
@@ -107,4 +109,4 @@ f() {
 #     return 0
 #   fi
 # }
-
+export PATH=$PATH:~/.ssh
