@@ -19,7 +19,7 @@ if has('reltime')
     lockvar! g:_SYNTASTIC_START
 endif
 
-let g:_SYNTASTIC_VERSION = '3.7.0-202'
+let g:_SYNTASTIC_VERSION = '3.9.0-44'
 lockvar g:_SYNTASTIC_VERSION
 
 " Sanity checks {{{1
@@ -36,7 +36,8 @@ for s:feature in [
             \ 'modify_fname',
             \ 'quickfix',
             \ 'reltime',
-            \ 'user_commands'
+            \ 'statusline',
+            \ 'user_commands',
         \ ]
     if !has(s:feature)
         call syntastic#log#error('need Vim compiled with feature ' . s:feature)
@@ -57,7 +58,7 @@ elseif executable('uname')
     try
         let g:_SYNTASTIC_UNAME = split(syntastic#util#system('uname'), "\n")[0]
     catch /\m^Vim\%((\a\+)\)\=:E484/
-        call syntastic#log#error("your shell " .  syntastic#util#var('shell') . " can't handle traditional UNIX syntax for redirections")
+        call syntastic#log#error("can't run external programs (misconfigured shell options?)")
         finish
     catch /\m^Vim\%((\a\+)\)\=:E684/
         let g:_SYNTASTIC_UNAME = 'Unknown'
@@ -66,6 +67,15 @@ else
     let g:_SYNTASTIC_UNAME = 'Unknown'
 endif
 lockvar g:_SYNTASTIC_UNAME
+
+" XXX Ugly hack to make g:_SYNTASTIC_UNAME available to :SyntasticInfo without
+" polluting session namespaces
+let g:syntastic_version =
+    \ g:_SYNTASTIC_VERSION .
+    \ ' (Vim ' . v:version . (has('nvim') ? ', Neovim' : '') . ', ' .
+    \ g:_SYNTASTIC_UNAME .
+    \ (has('gui') ? ', GUI' : '') . ')'
+lockvar g:syntastic_version
 
 " }}}1
 
@@ -126,20 +136,26 @@ endif
 
 " Debug {{{1
 
-let s:_DEBUG_DUMP_OPTIONS = [
+let g:_SYNTASTIC_SHELL_OPTIONS = [
         \ 'shell',
         \ 'shellcmdflag',
         \ 'shellpipe',
         \ 'shellquote',
         \ 'shellredir',
-        \ 'shellslash',
         \ 'shelltemp',
         \ 'shellxquote'
     \ ]
-if exists('+shellxescape')
-    call add(s:_DEBUG_DUMP_OPTIONS, 'shellxescape')
-endif
-lockvar! s:_DEBUG_DUMP_OPTIONS
+for s:feature in [
+        \ 'autochdir',
+        \ 'shellslash',
+        \ 'shellxescape',
+    \ ]
+
+    if exists('+' . s:feature)
+        call add(g:_SYNTASTIC_SHELL_OPTIONS, s:feature)
+    endif
+endfor
+lockvar! g:_SYNTASTIC_SHELL_OPTIONS
 
 " debug constants
 let     g:_SYNTASTIC_DEBUG_TRACE         = 1
@@ -172,11 +188,20 @@ let s:_quit_pre = []
 " @vimlint(EVL103, 1, a:cmdLine)
 " @vimlint(EVL103, 1, a:argLead)
 function! s:CompleteCheckerName(argLead, cmdLine, cursorPos) abort " {{{2
-    let checker_names = []
-    for ft in s:_resolve_filetypes([])
-        call extend(checker_names, s:registry.getNamesOfAvailableCheckers(ft))
-    endfor
-    return join(checker_names, "\n")
+    let names = []
+
+    let sep_idx = stridx(a:argLead, '/')
+    if sep_idx >= 1
+        let ft = a:argLead[: sep_idx-1]
+        call extend(names, map( s:registry.getNamesOfAvailableCheckers(ft), 'ft . "/" . v:val' ))
+    else
+        for ft in s:registry.resolveFiletypes(&filetype)
+            call extend(names, s:registry.getNamesOfAvailableCheckers(ft))
+        endfor
+        call extend(names, map( copy(s:registry.getKnownFiletypes()), 'v:val . "/"' ))
+    endif
+
+    return join(names, "\n")
 endfunction " }}}2
 " @vimlint(EVL103, 0, a:cursorPos)
 " @vimlint(EVL103, 0, a:cmdLine)
@@ -214,8 +239,10 @@ endfunction " }}}2
 
 function! SyntasticInfo(...) abort " {{{2
     call s:modemap.modeInfo(a:000)
-    call s:registry.echoInfoFor(s:_resolve_filetypes(a:000))
+    call s:registry.echoInfoFor(a:000)
     call s:_explain_skip(a:000)
+    call syntastic#log#debugShowOptions(g:_SYNTASTIC_DEBUG_TRACE, g:_SYNTASTIC_SHELL_OPTIONS)
+    call syntastic#log#debugDump(g:_SYNTASTIC_DEBUG_VARIABLES)
 endfunction " }}}2
 
 function! SyntasticErrors() abort " {{{2
@@ -235,7 +262,7 @@ function! SyntasticToggleMode() abort " {{{2
 endfunction " }}}2
 
 function! SyntasticSetLoclist() abort " {{{2
-    call g:SyntasticLoclist.current().setloclist()
+    call g:SyntasticLoclist.current().setloclist(0)
 endfunction " }}}2
 
 " }}}1
@@ -244,8 +271,9 @@ endfunction " }}}2
 
 augroup syntastic
     autocmd!
-    autocmd VimEnter * call s:VimEnterHook()
-    autocmd BufEnter * call s:BufEnterHook(expand('<afile>', 1))
+    autocmd VimEnter    * call s:VimEnterHook()
+    autocmd BufEnter    * call s:BufEnterHook(expand('<afile>', 1))
+    autocmd BufWinEnter * call s:BufWinEnterHook(expand('<afile>', 1))
 augroup END
 
 if g:syntastic_nested_autocommands
@@ -296,18 +324,31 @@ function! s:BufEnterHook(fname) abort " {{{2
                 call remove(s:_check_stack, -idx - 1)
                 call s:UpdateErrors(buf, 1, [])
             endif
-        else
+        elseif &buftype ==# ''
             call s:notifiers.refresh(g:SyntasticLoclist.current())
         endif
     elseif &buftype ==# 'quickfix'
         " TODO: this is needed because in recent versions of Vim lclose
         " can no longer be called from BufWinLeave
         " TODO: at this point there is no b:syntastic_loclist
-        let loclist = filter(copy(getloclist(0)), 'v:val["valid"] == 1')
+        let loclist = filter(copy(getloclist(0)), 'v:val["valid"]')
         let owner = str2nr(getbufvar(buf, 'syntastic_owner_buffer'))
         let buffers = syntastic#util#unique(map(loclist, 'v:val["bufnr"]') + (owner ? [owner] : []))
         if !empty(get(w:, 'syntastic_loclist_set', [])) && !empty(loclist) && empty(filter( buffers, 'syntastic#util#bufIsActive(v:val)' ))
             call SyntasticLoclistHide()
+        endif
+    endif
+endfunction " }}}2
+
+function! s:BufWinEnterHook(fname) abort " {{{2
+    let buf = syntastic#util#fname2buf(a:fname)
+    call syntastic#log#debug(g:_SYNTASTIC_DEBUG_AUTOCOMMANDS,
+        \ 'autocmd: BufWinEnter, buffer ' . buf . ' = ' . string(a:fname) . ', &buftype = ' . string(&buftype))
+    if buf > 0 && getbufvar(buf, '&buftype') ==# ''
+        let idx = index(reverse(copy(s:_check_stack)), buf)
+        if idx >= 0 && !has('vim_starting')
+            call remove(s:_check_stack, -idx - 1)
+            call s:UpdateErrors(buf, 1, [])
         endif
     endif
 endfunction " }}}2
@@ -344,7 +385,7 @@ endfunction " }}}2
 "refresh and redraw all the error info for this buf when saving or reading
 function! s:UpdateErrors(buf, auto_invoked, checker_names) abort " {{{2
     call syntastic#log#debugShowVariables(g:_SYNTASTIC_DEBUG_TRACE, 'version')
-    call syntastic#log#debugShowOptions(g:_SYNTASTIC_DEBUG_TRACE, s:_DEBUG_DUMP_OPTIONS)
+    call syntastic#log#debugShowOptions(g:_SYNTASTIC_DEBUG_TRACE, g:_SYNTASTIC_SHELL_OPTIONS)
     call syntastic#log#debugDump(g:_SYNTASTIC_DEBUG_VARIABLES)
     call syntastic#log#debug(g:_SYNTASTIC_DEBUG_TRACE, 'UpdateErrors' . (a:auto_invoked ? ' (auto)' : '') .
         \ ': ' . (len(a:checker_names) ? join(a:checker_names) : 'default checkers'))
@@ -355,17 +396,15 @@ function! s:UpdateErrors(buf, auto_invoked, checker_names) abort " {{{2
         return
     endif
 
-    let run_checks = !a:auto_invoked || s:modemap.doAutoChecking()
+    let run_checks = !a:auto_invoked || s:modemap.doAutoChecking(a:buf)
     if run_checks
         call s:CacheErrors(a:buf, a:checker_names)
-        call syntastic#util#setChangedtick(a:buf)
-    else
-        if a:auto_invoked
-            return
-        endif
+        call syntastic#util#setLastTick(a:buf)
+    elseif a:auto_invoked
+        return
     endif
 
-    let loclist = g:SyntasticLoclist.current()
+    let loclist = g:SyntasticLoclist.current(a:buf)
 
     if exists('*SyntasticCheckHook')
         call SyntasticCheckHook(loclist.getRaw())
@@ -381,14 +420,8 @@ function! s:UpdateErrors(buf, auto_invoked, checker_names) abort " {{{2
         let do_jump = 0
     endif
 
-    let w:syntastic_loclist_set = []
     if syntastic#util#var('always_populate_loc_list') || do_jump
-        call syntastic#log#debug(g:_SYNTASTIC_DEBUG_NOTIFICATIONS, 'loclist: setloclist (new)')
-        call setloclist(0, loclist.getRaw())
-        if !exists('b:syntastic_changedtick')
-            call syntastic#util#setChangedtick(a:buf)
-        endif
-        let w:syntastic_loclist_set = [a:buf, b:syntastic_changedtick]
+        call loclist.setloclist(1)
         if run_checks && do_jump && !loclist.isEmpty()
             call syntastic#log#debug(g:_SYNTASTIC_DEBUG_NOTIFICATIONS, 'loclist: jump')
             execute 'silent! lrewind ' . do_jump
@@ -409,11 +442,9 @@ endfunction " }}}2
 
 "clear the loc list for the buffer
 function! s:ClearCache(buf) abort " {{{2
-    call s:notifiers.reset(g:SyntasticLoclist.current())
-    let loclist = getbufvar(a:buf, 'syntastic_loclist')
-    if type(loclist) == type({})
-        call loclist.destroy()
-    endif
+    let loclist = g:SyntasticLoclist.current(a:buf)
+    call s:notifiers.reset(loclist)
+    call loclist.destroy()
 endfunction " }}}2
 
 "detect and cache all syntax errors in this buffer
@@ -422,28 +453,32 @@ function! s:CacheErrors(buf, checker_names) abort " {{{2
         \ (len(a:checker_names) ? join(a:checker_names) : 'default checkers'))
     call s:ClearCache(a:buf)
     let newLoclist = g:SyntasticLoclist.New([])
+    call newLoclist.setOwner(a:buf)
 
     if !s:_skip_file(a:buf)
         " debug logging {{{3
         call syntastic#log#debugShowVariables(g:_SYNTASTIC_DEBUG_TRACE, 'aggregate_errors')
+        if syntastic#util#isRunningWindows()
+            call syntastic#log#debug(g:_SYNTASTIC_DEBUG_CHECKERS, '$TMP = ' . string($TMP) . ', $TEMP = ' . string($TEMP))
+        else
+            call syntastic#log#debug(g:_SYNTASTIC_DEBUG_CHECKERS, '$TERM = ' . string($TERM))
+            call syntastic#log#debug(g:_SYNTASTIC_DEBUG_CHECKERS, '$TMPDIR = ' . string($TMPDIR))
+        endif
         call syntastic#log#debug(g:_SYNTASTIC_DEBUG_CHECKERS, '$PATH = ' . string($PATH))
         call syntastic#log#debug(g:_SYNTASTIC_DEBUG_TRACE, 'getcwd() = ' . string(getcwd()))
         " }}}3
 
-        let filetypes = s:_resolve_filetypes([])
-        let aggregate_errors = syntastic#util#var('aggregate_errors') || len(filetypes) > 1
+        let clist = s:registry.getCheckers(getbufvar(a:buf, '&filetype'), a:checker_names)
+
+        let aggregate_errors =
+            \ syntastic#util#var('aggregate_errors') || len(syntastic#util#unique(map(copy(clist), 'v:val.getFiletype()'))) > 1
         let decorate_errors = aggregate_errors && syntastic#util#var('id_checkers')
         let sort_aggregated_errors = aggregate_errors && syntastic#util#var('sort_aggregated_errors')
-
-        let clist = []
-        for type in filetypes
-            call extend(clist, s:registry.getCheckers(type, a:checker_names))
-        endfor
 
         let names = []
         let unavailable_checkers = 0
         for checker in clist
-            let cname = checker.getFiletype() . '/' . checker.getName()
+            let cname = checker.getCName()
             if !checker.isAvailable()
                 call syntastic#log#debug(g:_SYNTASTIC_DEBUG_TRACE, 'CacheErrors: Checker ' . cname . ' is not available')
                 let unavailable_checkers += 1
@@ -464,7 +499,7 @@ function! s:CacheErrors(buf, checker_names) abort " {{{2
                     call syntastic#log#debug(g:_SYNTASTIC_DEBUG_LOCLIST, 'sorted:', loclist)
                 endif
 
-                let newLoclist = newLoclist.extend(loclist)
+                call newLoclist.extend(loclist)
 
                 if !aggregate_errors
                     break
@@ -584,7 +619,7 @@ function! SyntasticMake(options) abort " {{{2
             let err_lines = call('syntastic#preprocess#' . a:options['preprocess'], [err_lines])
             call syntastic#log#debug(g:_SYNTASTIC_DEBUG_LOCLIST, 'preprocess:', err_lines)
         endif
-        lgetexpr err_lines
+        noautocmd lgetexpr err_lines
 
         let errors = deepcopy(getloclist(0))
 
@@ -597,6 +632,12 @@ function! SyntasticMake(options) abort " {{{2
         catch /\m^Vim\%((\a\+)\)\=:E380/
             " E380: At bottom of quickfix stack
             call setloclist(0, [], 'r')
+            try
+                " Vim 7.4.2200 or later
+                call setloclist(0, [], 'r', { 'title': '' })
+            catch /\m^Vim\%((\a\+)\)\=:E\%(118\|731\)/
+                " do nothing
+            endtry
         catch /\m^Vim\%((\a\+)\)\=:E776/
             " E776: No location list
             " do nothing
@@ -657,11 +698,6 @@ endfunction " }}}2
 " }}}1
 
 " Utilities {{{1
-
-function! s:_resolve_filetypes(filetypes) abort " {{{2
-    let type = len(a:filetypes) ? a:filetypes[0] : &filetype
-    return split( get(g:syntastic_filetype_map, type, type), '\m\.' )
-endfunction " }}}2
 
 function! s:_ignore_file(filename) abort " {{{2
     let fname = fnamemodify(a:filename, ':p')

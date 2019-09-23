@@ -11,7 +11,6 @@ fi
 
 #setting prompt
 export PS1="[\[\e[0;31m\]\u@\h \[\e[0;37m\]\W]\[\e[1;37m\]$ \[\e[0m\]"
-
 ### export PATH
 export PATH=/usr/bin:/bin:/usr/local/bin:/local/bin:/sbin:/usr/sbin:/usr/ucb:/usr/sbin:/usr/bsd:/gpfs1/Platform/lsf912/9.1/linux2.6-glibc2.3-x86_64/etc:/gpfs1/Platform/lsf912/9.1/linux2.6-glibc2.3-x86_64/bin:/gpfs1/Platform/ppm912/9.1/bin:/gpfs1/Platform/ppm912/9.1/linux2.6-glibc2.3-x86_64/bin:/gpfs1/Platform/pac912/gui/3.0/bin:/gpfs1/Platform/pac912/perf/1.2/bin:/gpfs1/Platform/ppm912/9.1/bin:/gpfs1/Platform/ppm912/9.1/linux2.6-glibc2.3-x86_64/bin:/gpfs1/opt/intel/icsxe//impi/4.1.3.048/intel64/bin:/gpfs1/opt/intel/icsxe//impi/4.1.3.048/intel64/bin:/usr/lib64/qt-3.3/bin:/usr/lpp/mmfs/bin:/gpfs1/opt/intel/flexlm
 

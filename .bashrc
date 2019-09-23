@@ -1,5 +1,4 @@
 # .bashrc
-module load cdo
 # Source global definitions
 
 if [ -f /etc/bashrc ]; then
@@ -26,6 +25,7 @@ alias libpath='echo -e ${LD_LIBRARY_PATH//:/\\n}'
 alias h='cd /incois_ncmrwfx/incois/hycom/'
 alias hp='cd /incois_ncmrwfx/incois/hycom/HWRF_parent/'
 alias ho='cd /incois_ncmrwfx/incois_tccsym/OUTPUTS/pytmp/'
+alias hi='cd /incois_ncmrwfx/incois_tccsym/FORCING/'
 alias hw='cd /incois_ncmrwfx/incois/hycom/HWRF_parent/hwrfrun/wrappers/'
 alias hlog='cd /incois_ncmrwfx/incois/hycom/HWRF_parent/hwrfrun/wrappers/logs/'
 alias hsrc='cd /incois_ncmrwfx/incois/hycom/HWRF_parent/hwrfrun/sorc/'
@@ -110,3 +110,20 @@ f() {
 #   fi
 # }
 export PATH=$PATH:~/.ssh
+alias nb="cd /incois_ncmrwfx/incois_tccsym/NIOT_BUOYS"
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/incois_ncmrwfx/incois/hycom/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/incois_ncmrwfx/incois/hycom/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/incois_ncmrwfx/incois/hycom/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/incois_ncmrwfx/incois/hycom/miniconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
