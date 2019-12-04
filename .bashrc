@@ -40,7 +40,8 @@ hdsets=/incois_ncmrwfx/incois_tccsym/FORCING
 ho=/incois_ncmrwfx/incois_tccsym/OUTPUTS/pytmp
 
 # some more aliases
-alias util='ssh -X -t iitmutil03 "cd $PWD; bash --login"'
+alias util='ssh -o PubkeyAuthentication=no  -X -t iitmutil03 "cd $PWD; bash --login"'
+
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
