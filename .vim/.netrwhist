@@ -1,8 +1,9 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =6
+let g:netrw_dirhist_cnt =7
 let g:netrw_dirhist_1='/moes/home/hycom/.dotfiles/.vim/syntax'
 let g:netrw_dirhist_2='/incois_ncmrwfx/incois/hycom/HWRF_parent/hwrfrun/wrappers/startFilesArchive'
 let g:netrw_dirhist_3='/incois_ncmrwfx/incois/hycom/ARVIND_SINGH/1_RAMA_FD'
 let g:netrw_dirhist_4='/incois_ncmrwfx/incois_tccsym/NIOT_BUOYS/omni_db/temp/2017'
 let g:netrw_dirhist_5='/incois_ncmrwfx/incois_tccsym/NIOT_BUOYS/scripts'
 let g:netrw_dirhist_6='/incois_ncmrwfx/incois_tccsym/OUTPUTS/pytmp/process_study_HYCOMcoupled/2019061006/01A/tracker'
+let g:netrw_dirhist_7='/incois_ncmrwfx/incois_tccsym/FORCING/kyarr_IMD/TCvitals'
