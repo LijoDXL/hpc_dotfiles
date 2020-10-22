@@ -127,4 +127,6 @@ else
 fi
 unset __conda_setup
 # <<< conda initialize <<<
-
+########## Followed the link to add custom modules to PythonPath:############
+#    https://stackoverflow.com/questions/37006114/anaconda-permanently-include-external-packages-like-in-pythonpath
+########################
