@@ -20,6 +20,7 @@ alias pd='pushd .'
 alias dirs='dirs -v'
 alias path='echo -e ${PATH//:/\\n}'
 alias libpath='echo -e ${LD_LIBRARY_PATH//:/\\n}'
+alias jn='cd /incois_ncmrwfx/incois_tccsym/JupyterNotebooks'
 
 # aliases for HWRF workflow
 alias h='cd /incois_ncmrwfx/incois/hycom/'
