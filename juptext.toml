@@ -1,0 +1,2 @@
+formats = "ipynb,notebook_md//md"
+notebook_extensions = "ipynb,Rmd"
