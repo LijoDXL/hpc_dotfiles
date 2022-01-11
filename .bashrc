@@ -114,20 +114,19 @@ f() {
 export PATH=$PATH:~/.ssh
 alias nb="cd /incois_ncmrwfx/incois_tccsym/NIOT_BUOYS"
 
+
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/incois_ncmrwfx/incois/hycom/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+__conda_setup="$('/incois_ncmrwfx/incois/hycom/mambaforge/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
-    if [ -f "/incois_ncmrwfx/incois/hycom/miniconda3/etc/profile.d/conda.sh" ]; then
-        . "/incois_ncmrwfx/incois/hycom/miniconda3/etc/profile.d/conda.sh"
+    if [ -f "/incois_ncmrwfx/incois/hycom/mambaforge/etc/profile.d/conda.sh" ]; then
+        . "/incois_ncmrwfx/incois/hycom/mambaforge/etc/profile.d/conda.sh"
     else
-        export PATH="/incois_ncmrwfx/incois/hycom/miniconda3/bin:$PATH"
+        export PATH="/incois_ncmrwfx/incois/hycom/mambaforge/bin:$PATH"
     fi
 fi
 unset __conda_setup
 # <<< conda initialize <<<
-########## Followed the link to add custom modules to PythonPath:############
-#    https://stackoverflow.com/questions/37006114/anaconda-permanently-include-external-packages-like-in-pythonpath
-########################
+

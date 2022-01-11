@@ -1,4 +1,5 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =2
+let g:netrw_dirhist_cnt =3
 let g:netrw_dirhist_1='/moes/home/hycom/WW3_force/Tauktae'
 let g:netrw_dirhist_2='/incois_ncmrwfx/incois_tccsym/HWRFwindsMerge/fani'
+let g:netrw_dirhist_3='/incois_ncmrwfx/incois/hycom/mambaforge/envs/TCPI/lib/python3.10/site-packages'
